@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>29.2.1</version>
+		<relativePath />
+	</parent>
+	
+	<developers>
+		<developer>
+			<id>yasminromi</id>
+			<email>yasmin.romi@al.infnet.edu.br</email>
+			<name>Yasmin Romi</name>
+			<organization>Instituto Infnet</organization>
+		</developer>
+	</developers>
+	
+	<contributors>
+		<contributor>
+			<organization>UFRJ</organization>
+			<name>Rodrigo Oliveira</name>
+		</contributor>
+	</contributors>
+
+	<groupId>com.mycompany</groupId>
+	<artifactId>IIWM</artifactId>
+	<version>1.0</version>
+
+	<name>Process Pixels</name>
+	<description>A Maven project implementing an ImageJ 1.x plugin.</description>
+	<url>http://mycompany.com/imagej/process-pixels/</url>
+	<inceptionYear>2012</inceptionYear>
+	<organization>
+		<name>My Company</name>
+		<url>http://mycompany.com/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Simplified BSD License</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<mailingLists>
+		<mailingList>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc/tags/imagej</archive>
+		</mailingList>
+	</mailingLists>
+
+	<properties>
+		<main-class>Process_Pixels</main-class>
+		<license.licenseName>unlicense</license.licenseName>
+		<license.copyrightOwners>N/A</license.copyrightOwners>
+		<license.projectName>ImageJ software for multidimensional image processing and analysis.</license.projectName>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.mathworks.engine</groupId>
+			<artifactId>mathworks</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/IIWM/engine.jar</systemPath>
+		</dependency>
+	
+		<dependency>
+		    <groupId>sc.fiji</groupId>
+		    <artifactId>imglib-clearvolume</artifactId>
+		    <version>1.4.2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.twelvemonkeys.imageio</groupId>
+		    <artifactId>imageio-tiff</artifactId>
+		    <version>3.2.1</version>
+		</dependency>
+		
+		
+	</dependencies>
+
+
+</project>
