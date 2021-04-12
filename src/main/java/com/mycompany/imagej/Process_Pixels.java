@@ -23,6 +23,7 @@ public class Process_Pixels implements Command  {
 	private Integer currentImage = null;
 	private final Integer SKIP_IMAGES = 10;
 	private SegmentationUSImageID model;
+	static ImageJ ij;
 
 
 	private SegmentationUSImageID showDialog() {
@@ -30,16 +31,16 @@ public class Process_Pixels implements Command  {
 
 		gd.addChoice("Opção de Função de Fechamento", new String[] { "hull", "linear" }, "hull");
 		gd.addNumericField("Metro de Pixel", 6E-6, 0);
-		gd.addNumericField("Distância entre Rótulo", 6E-6, 0);
-		gd.addDirectoryField("Imagens", "C:\\Users\\Yasmin\\Documents\\TCC\\segmented\\");
-		gd.addDirectoryField("Imagens com Máscara", "C:\\Users\\Yasmin\\Documents\\TCC\\Masks_751\\");
+		gd.addNumericField("Distância entre Rótulo", 25E-6, 0);
+		gd.addDirectoryField("Imagens", "");
+		gd.addDirectoryField("Imagens com Máscara", "");
 		gd.addChoice("Tipo do Filtro", new String[] { "None", "Median", "Wavelet" }, "None");
 		gd.addStringField("Nível de Processamento", "2");
 		gd.addStringField("Camada do Tumor", "Tumor");
 		gd.addCheckbox("Index da Camada", true);
 		gd.addCheckbox("Salvar Conteúdo", true);
 		gd.addCheckbox("Editar máscaras com LiveWire", true);
-		gd.addDirectoryField("Pasta para Salvar", "C:\\Users\\Yasmin\\Documents\\TCC\\segmented\\");
+		gd.addDirectoryField("Pasta para Salvar", "");
 
 		gd.showDialog();
 		if (gd.wasCanceled()) {
@@ -72,7 +73,7 @@ public class Process_Pixels implements Command  {
 
 		try {
 			
-			MatLab.callMatlab(model);
+			MatLab.callMatlab(model, ij);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,10 +127,9 @@ public class Process_Pixels implements Command  {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		final ImageJ ij = new ImageJ();
+		ij = new ImageJ();
 		ij.launch(args);
 
-		// Launch our "Hello World" command right away.
 		ij.command().run(Process_Pixels.class, true);
 	}
 

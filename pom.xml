@@ -66,9 +66,46 @@
 			<id>scijava.public</id>
 			<url>https://maven.scijava.org/content/groups/public</url>
 		</repository>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>sc.iview</groupId>
+			<artifactId>sciview</artifactId>
+			<version>c371cb5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-common</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>3D_Viewer</artifactId>
+		</dependency>
+		
+		<!-- Java 3D dependencies -->
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>j3dcore</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>j3dutils</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>vecmath</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
@@ -79,25 +116,23 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>io.scif</groupId>
+			<artifactId>scifio</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>graphics.scenery</groupId>
+			<artifactId>scenery</artifactId>
+			<version>9747a22</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.mathworks.engine</groupId>
 			<artifactId>mathworks</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/IIWM/engine.jar</systemPath>
 		</dependency>
-	
-		<dependency>
-		    <groupId>sc.fiji</groupId>
-		    <artifactId>imglib-clearvolume</artifactId>
-		    <version>1.4.2</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>com.twelvemonkeys.imageio</groupId>
-		    <artifactId>imageio-tiff</artifactId>
-		    <version>3.2.1</version>
-		</dependency>
-		
 		
 	</dependencies>
 

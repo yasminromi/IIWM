@@ -12,13 +12,15 @@ function [I3] = sumImages(rootImages, mask_filename, rootMasks, savePath)
         fprintf(name);
         
         I = imread(fullfile(rootImages, name));
-        I2 = 255 - imread(fullfile(rootMasks, mask_filename(im,:)));
+        I4 = imread(fullfile(rootMasks, mask_filename(im,:)));
     
-        I3 = imadd(I,I2);
+        I3 = imadd(I,I4);
         stack(:,:,im) = I3;
         imwrite(I3, fullfile(savePath, name));
         imwrite(stack(:, :, im), fullfile(savePath, 'final.tif'), 'WriteMode', 'append');
     end
+    fprintf('end sum');
+   % volumeViewer(stack);
     
    
 end

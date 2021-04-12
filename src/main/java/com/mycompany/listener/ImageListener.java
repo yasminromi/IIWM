@@ -24,8 +24,8 @@ public class ImageListener implements ij.ImageListener {
 
     @Override
     public void imageClosed(ImagePlus imagePlus) {
-        if(imagePlus.getOriginalFileInfo() == null) {
-            IJ.saveAsTiff(imagePlus, model.getRootMask() + "\\" + fileName);
+    	if(imagePlus != null && imagePlus.getOriginalFileInfo() == null && fileName != null && model != null ) {
+            IJ.saveAsTiff(imagePlus, model.getRootMask() + "\\" + fileName.replace(".tif", "_mask.tif"));
         } else {
             process.openNextImage();
         }

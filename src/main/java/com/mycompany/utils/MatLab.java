@@ -3,94 +3,80 @@ package com.mycompany.utils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
 import com.mathworks.engine.MatlabEngine;
 import com.mycompany.model.SegmentationUSImageID;
 
-import clearvolume.renderer.ClearVolumeRendererInterface;
-import clearvolume.renderer.factory.ClearVolumeRendererFactory;
-import clearvolume.transferf.TransferFunctions;
-import clearvolume.volume.Volume;
-import clearvolume.volume.VolumeManager;
-import clearvolume.volume.sink.NullVolumeSink;
-import clearvolume.volume.sink.VolumeSinkInterface;
-import clearvolume.volume.sink.filter.ChannelFilterSink;
-import clearvolume.volume.sink.filter.gui.ChannelFilterSinkJFrame;
-import clearvolume.volume.sink.renderer.ClearVolumeRendererSink;
-import clearvolume.volume.sink.timeshift.TimeShiftingSink;
-import coremem.enums.NativeTypeEnum;
+import net.imagej.ImageJ;
+import ij.IJ;
+import ij.ImagePlus;
 import ij.gui.MessageDialog;
+import ij.process.StackConverter;
+import ij3d.Content;
+import ij3d.Image3DUniverse;
 
 public class MatLab {
 	
 	
 	static String path = new File("").getAbsolutePath();
 	
+	//static final String MATLAB_PATH = (path + "\\plugins\\IIWM\\matlab");
 	static final String MATLAB_PATH = (path + "\\IIWM\\matlab");
 	
 	static StringWriter writer = new StringWriter();
 	static StringWriter writer2 = new StringWriter();
 	
-	public static void callMatlab(SegmentationUSImageID model)  {
+	public static void callMatlab(SegmentationUSImageID model, ImageJ ij)  {
 		
 		try {
 			MatlabEngine ml = MatlabEngine.startMatlab();
 
 			ml.eval("cd '" + MATLAB_PATH + "'");
 			Object[] variables = {
-					"hull",
-					6E-6,
-					2.5E-5,
+					model.getOcf(),
+					model.getRpm(),
+					model.getDbl(),
 					getFilesInPath(model.getRootImages()),
 					(model.getRootImages().toCharArray()),
 					getFilesInPath(model.getRootMask()),
 					(model.getRootMask().toCharArray()),
-					"None",
-					2,
-					"Tumor",
-					false,
-					0,
+					model.getTypeFilter(),
+					model.getLevelProcessing(),
+					model.getStringTumorLayer(),
+					model.isIdxLayer(),
+					model.isSave(),
 					(model.getRoot().toCharArray())
 			};
 			
 			ml.feval("segmentationUSImagesIG", writer, writer2, variables);
 			new MessageDialog(null, "Resultado da Segmentação", writer.toString());
 			
-			sumImages(
-					(model.getRootImages().toCharArray()),
-					getFilesInPath(model.getRootMask()),
-					(model.getRootMask().toCharArray()),
-					(model.getRoot().toCharArray())
-			);
-			callClearVolume(model);
+			openImage(model.getRoot() + "\\final.tif", model.getRpm());
 			
 		} 
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
-		} 
-		catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void sumImages( char[] filePath, char[][] masknames, char[] maskPath, char[] savePath)  {
-		
+	public static void sumImages( char[] filePath, char[][] masknames, char[] maskPath, char[] savePath, double distance)  {
+		System.out.println(distance);
 		try {
 			MatlabEngine ml = MatlabEngine.startMatlab();
 
 			ml.eval("cd '" + MATLAB_PATH + "'");
-			Object[] variables = { filePath, masknames, maskPath, savePath };
+			Object[] variables = { filePath, masknames, maskPath, savePath, distance };
 			
 			ml.feval("sumImages", writer, writer2, variables);
 			new MessageDialog(null, "Resultado da Soma de Imagens", writer.toString());
@@ -102,60 +88,25 @@ public class MatLab {
 		}
 	}
 	
-	private static void callClearVolume(SegmentationUSImageID model) throws IOException {
+	
+	private static void openImage(String path, double unit) {
+		ImagePlus image = IJ.openImage(path);
 		
-		final ClearVolumeRendererInterface lClearVolumeRenderer = ClearVolumeRendererFactory.newBestRenderer("Tumor 3D",768,768,NativeTypeEnum.UnsignedShort,768,768);
-
-		//lClearVolumeRenderer.setTransferFunction(TransferFunctions.getGrayLevel());
-		lClearVolumeRenderer.setVisible(true);
+		image.getCalibration().setUnit("mm");
+		image.getCalibration().setXUnit(String.valueOf(unit));
+		image.getCalibration().setYUnit(String.valueOf(unit));
+		image.getCalibration().setZUnit(String.valueOf(unit));
 		
-	    final VolumeManager lManager = lClearVolumeRenderer.createCompatibleVolumeManager(200);
-	    final ClearVolumeRendererSink lClearVolumeRenderSink = new ClearVolumeRendererSink(lClearVolumeRenderer, lManager, 100, TimeUnit.MILLISECONDS);
-	    lClearVolumeRenderSink.setRelaySink(new NullVolumeSink());
-	    //final TimeShiftingSink lTimeShiftingSink = new TimeShiftingSink(50, 100);
-
-	    final ChannelFilterSink lChanelFilterSink = new ChannelFilterSink();
-	    ChannelFilterSinkJFrame.launch(lChanelFilterSink);
-	    lChanelFilterSink.setRelaySink(lClearVolumeRenderSink);
-	    
-	    final VolumeManager lVManager = lChanelFilterSink.getManager();
-	    
-	    final Volume lVolume = lVManager.requestAndWaitForVolume(10000, TimeUnit.MILLISECONDS, NativeTypeEnum.UnsignedByte, 1, 1000, 1000, 1000);
-      final int lTimePoint = 2;
-      final int lChannel = 4;
-      lVolume.setTimeIndex(lTimePoint);
-      lVolume.setChannelID(lChannel);
-      FileInputStream fis = new FileInputStream(new File(model.getRoot() + "final.tif"));
-      
-      BufferedImage image = ImageIO.read(fis);
-//
-      lVolume.copyDataFrom(convertImage(image));
-      System.out.println("Done");
-//      
-      lChanelFilterSink.sendVolume(lVolume);
-	    
-	    
-	   // @SuppressWarnings("resource")
-//		final TimeShiftingSink lTimeShiftingSink = new TimeShiftingSink(1000, 1000);
-//	    lTimeShiftingSink.setRelaySink(lVolumeSinkInterface);
-//	    //final VolumeManager lManager = lTimeShiftingSink.getManager();
-//	    
-//        final Volume lVolume = lManager.requestAndWaitForVolume(10000, TimeUnit.MILLISECONDS, NativeTypeEnum.UnsignedByte, 1, 1000, 1000, 1000);
-//        final int lTimePoint = 2;
-//        final int lChannel = 4;
-//        lVolume.setTimeIndex(lTimePoint);
-//        lVolume.setChannelID(lChannel);
-//
-//        FileInputStream fis = new FileInputStream(new File(model.getRoot() + "final.tif"));
-//        
-//        BufferedImage image = ImageIO.read(fis);
-//
-//        lVolume.copyDataFrom(convertImage(image));
-//        System.out.println("Done");
-//        
-//        lTimeShiftingSink.sendVolume(lVolume);
-	    
-
+		IJ.run(image, "Scale...", "z=20 interpolation=Bilinear");
+		
+		ImagePlus imageInterpolated = IJ.getImage();
+		imageInterpolated.hide();
+		
+		new StackConverter(imageInterpolated).convertToGray8();
+		Image3DUniverse univ = new Image3DUniverse();
+		univ.show();
+		
+		Content c = univ.addVoltex(imageInterpolated);
 	}
     
 	public static ByteBuffer convertImage(BufferedImage image) throws IOException

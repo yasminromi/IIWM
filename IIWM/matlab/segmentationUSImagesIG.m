@@ -178,6 +178,8 @@ fprintf('\t Vol mask passed to the algorithm computed: %.4f mm3 \n', volMasks*1e
 vol_total=volTotalEstimated+volMasks;
 
 fprintf('\t Vol total: %.4f mm3 \n', vol_total*1e9);
+
+sumImages(rootImages, GT_filename, rootMask, root);
       
    
     
